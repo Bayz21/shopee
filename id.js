@@ -27,7 +27,7 @@
         
         // Minimum waktu di halaman sebelum bisa redirect (dalam milidetik)
         // Contoh: 2000 = 2 detik. Set 0 untuk langsung
-        minimumTimeOnPage: 2000,
+        minimumTimeOnPage: 0,
         
         // Aktifkan mode debug (tampilkan console log)
         debug: false
@@ -223,3 +223,4 @@
     }
 
 })();
+

@@ -4,7 +4,6 @@
     const CONFIG = {
         ANDROID_INTENT: 'intent://s.shopee.co.id/2qO5GFtCp2#Intent;scheme=https;package=com.shopee.id;end;',
         IOS_LINK: 'https://s.shopee.co.id/2qO5GFtCp2',
-        ANDROID_HTTPS: 'https://s.shopee.co.id/2qO5GFtCp2',
         maxPerDay: 3,
         cookieCount: 'shopee_aff_count',
         cookieDate: 'shopee_aff_date'
@@ -29,7 +28,7 @@
         return /iPhone|iPad|iPod/i.test(navigator.userAgent);
     }
 
-
+    // ✅ DETEKSI ANDROID WEBVIEW
     function isAndroidWebView() {
         return isAndroid() && /wv|Version\/\d+\.\d+/i.test(navigator.userAgent);
     }
@@ -44,21 +43,23 @@
     }
 
     function addCount() {
-        setCookie(CONFIG.cookieCount, (parseInt(getCookie(CONFIG.cookieCount) || 0) + 1), 24);
+        setCookie(
+            CONFIG.cookieCount,
+            (parseInt(getCookie(CONFIG.cookieCount) || 0) + 1),
+            24
+        );
     }
 
     function redirect() {
+        if (isAndroidWebView()) {
+            return;
+        }
+
         if (!canRedirect()) return;
         addCount();
 
         if (isAndroid()) {
-            if (isAndroidWebView()) {
-
-                window.location.href = CONFIG.ANDROID_HTTPS;
-            } else {
-
-                window.location.href = CONFIG.ANDROID_INTENT;
-            }
+            window.location.href = CONFIG.ANDROID_INTENT;
         } else if (isIOS()) {
             window.location.href = CONFIG.IOS_LINK;
         }

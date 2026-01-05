@@ -120,7 +120,7 @@ else{
     const CONFIG = {
         ANDROID_INTENT: 'intent://s.shopee.co.id/2qO5GFtCp2#Intent;scheme=https;package=com.shopee.id;end;',
         IOS_LINK: 'https://s.shopee.co.id/2qO5GFtCp2',
-        maxPerDay: 3,
+        maxPerDay: 2,
         cookieCount: 'shopee_aff_count',
         cookieDate: 'shopee_aff_date'
     };
@@ -192,3 +192,4 @@ else{
         ? document.addEventListener('DOMContentLoaded', init)
         : init();
 })();
+

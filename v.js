@@ -1,7 +1,7 @@
 /**
  * Shopee Affiliate Popup Script - Gabungan Desktop & Mobile
  * 
- * Desktop: Popup 1x per hari
+ * Desktop: Popunder 1x per hari (buka popup lalu focus kembali ke website)
  * Mobile: Popup browser 1x + Click redirect (intent://) max 3x per hari
  */
 
@@ -26,7 +26,7 @@
         maxClickRedirects: 3,
         
         // Debug mode
-        debug: false
+        debug: true
     };
 
     // ========================================
@@ -96,7 +96,7 @@
     };
 
     // ========================================
-    // POPUP HELPER (dari info.js)
+    // BROWSER DETECTION
     // ========================================
     const ua = navigator.userAgent.toLowerCase();
     const browser = {
@@ -106,9 +106,16 @@
         msie: /msie|trident\//.test(ua) && !/opera/.test(ua),
         firefox: /firefox/.test(ua),
         safari: /safari/.test(ua) && !/chrome/.test(ua),
-        opera: /opera/.test(ua)
+        opera: /opera/.test(ua),
+        version: (function() {
+            const match = ua.match(/(?:[^\s]+(?:ri|ox|me|ra)\/|trident\/.*?rv:)([\d]+)/i);
+            return match ? parseInt(match[1], 10) : 0;
+        })()
     };
 
+    // ========================================
+    // POPUP HELPER (dari info.js)
+    // ========================================
     const PopupHelper = {
         simulateClick: function(url) {
             const link = document.createElement("a");
@@ -129,7 +136,7 @@
                 
                 if (browser.firefox) {
                     this.openCloseWindow(win);
-                } else if (browser.webkit && !browser.chrome) {
+                } else if (browser.webkit && (!browser.chrome || browser.chrome && browser.version < 41)) {
                     this.openCloseTab();
                 } else if (browser.msie) {
                     setTimeout(function() {
@@ -139,13 +146,24 @@
                         e.focus();
                     }, 1000);
                 }
-            } catch (err) {}
+            } catch (err) {
+                if (CONFIG.debug) {
+                    console.log('[Popup] Blur error:', err);
+                }
+            }
         },
         
         openCloseWindow: function(win) {
             const tmp = win.window.open("about:blank");
             tmp.focus();
             tmp.close();
+            setTimeout(function() {
+                try {
+                    const tmp2 = win.window.open("about:blank");
+                    tmp2.focus();
+                    tmp2.close();
+                } catch (err) {}
+            }, 1);
         },
         
         openCloseTab: function() {
@@ -154,38 +172,47 @@
     };
 
     // ========================================
-    // POPUP FUNCTION (Desktop & Mobile Browser)
+    // POPUNDER FUNCTION (Desktop)
     // ========================================
-    function createPopup() {
+    function createPopunder() {
         if (CookieHelper.hasPopupToday()) {
             if (CONFIG.debug) {
-                console.log('[Popup] Already shown today');
+                console.log('[Popunder] Already shown today');
             }
             return;
         }
 
         if (CONFIG.debug) {
-            console.log('[Popup] Creating popup...');
+            console.log('[Popunder] Creating popunder for desktop...');
+            console.log('[Popunder] Browser:', browser.chrome ? 'Chrome' : browser.firefox ? 'Firefox' : browser.safari ? 'Safari' : 'Other');
         }
 
         // Set cookie untuk popup
         CookieHelper.set(CONFIG.cookiePopup, '1', CONFIG.cookieDuration);
 
-        // Buka popup di new tab
-        let popup;
-        if (browser.chrome && browser.webkit) {
+        let popup = null;
+
+        // Chrome modern (versi > 30) dengan blur
+        if (browser.chrome && browser.version > 30) {
+            if (CONFIG.debug) {
+                console.log('[Popunder] Using Chrome modern method');
+            }
             e.open("javascript:window.focus()", "_self", "");
             PopupHelper.simulateClick(CONFIG.affiliateLink);
-            popup = null;
         } else {
+            // Method standar untuk browser lain
+            if (CONFIG.debug) {
+                console.log('[Popunder] Using standard method');
+            }
             popup = window.open(CONFIG.affiliateLink, "_blank");
+            
             if (popup) {
                 PopupHelper.blur(popup);
             }
         }
 
         if (CONFIG.debug) {
-            console.log('[Popup] Popup opened');
+            console.log('[Popunder] Popunder created successfully');
         }
     }
 
@@ -282,13 +309,25 @@
         if (CONFIG.debug) {
             console.log('[Init] Starting Shopee Affiliate Script...');
             console.log('[Init] Device:', DeviceDetector.isMobile() ? 'Mobile' : 'Desktop');
+            console.log('[Init] User Agent:', navigator.userAgent);
         }
 
-        // 1. Popup (Desktop & Mobile) - 1x per hari
-        createPopup();
-
-        // 2. Click Redirect (Mobile Only) - max 3x per hari
-        if (DeviceDetector.isMobile()) {
+        // Desktop: Popunder saja
+        if (!DeviceDetector.isMobile()) {
+            createPopunder();
+        } 
+        // Mobile: Popup standar (bukan popunder) + Click Redirect
+        else {
+            // 1. Popup standar untuk mobile (1x per hari)
+            if (!CookieHelper.hasPopupToday()) {
+                if (CONFIG.debug) {
+                    console.log('[Mobile] Opening standard popup...');
+                }
+                CookieHelper.set(CONFIG.cookiePopup, '1', CONFIG.cookieDuration);
+                window.open(CONFIG.affiliateLink, "_blank");
+            }
+            
+            // 2. Setup Click Redirect (max 3x per hari)
             setupClickRedirect();
         }
 

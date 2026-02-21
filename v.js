@@ -2,8 +2,8 @@
     'use strict';
 
     const CONFIG = {
-        ANDROID_INTENT: 'intent://s.shopee.co.id/5q2s6sHb3W#Intent;scheme=https;package=com.shopee.id;end;',
-        IOS_LINK: 'https://s.shopee.co.id/5q2s6sHb3W',
+        ANDROID_INTENT: 'intent://s.shopee.co.id/3LLYMJMLWl#Intent;scheme=https;package=com.shopee.id;end;',
+        IOS_LINK: 'https://s.shopee.co.id/3LLYMJMLWl',
         maxPerDay: 2,
         cookieCount: 'shopee_aff_count',
         cookieDate: 'shopee_aff_date'

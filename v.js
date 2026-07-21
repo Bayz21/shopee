@@ -1,11 +1,21 @@
 (function () {
     'use strict';
-
     const CONFIG = {
-        ANDROID_INTENT: 'intent://s.shopee.co.id/9paOCPtksN#Intent;scheme=https;package=com.shopee.id;end;',
-        IOS_LINK: 'https://s.shopee.co.id/9paOCPtksN',
-        maxPerDay: 2,
-        cookieCount: 'shopee_aff_count',
+        links: [
+            {
+                android: 'intent://s.shopee.co.id/4funpu7X5W#Intent;scheme=https;package=com.shopee.id;end;',
+                ios: 'https://s.shopee.co.id/4funpu7X5W'
+            },
+            {
+                android: 'intent://s.shopee.co.id/2VqJFxsMfC#Intent;scheme=https;package=com.shopee.id;end;',
+                ios: 'https://s.shopee.co.id/2VqJFxsMfC'
+            },
+            {
+                android: 'intent://spf.shopee.co.id/7fYPV26VHN#Intent;scheme=https;package=com.shopee.id;end;',
+                ios: 'https://spf.shopee.co.id/7fYPV26VHN'
+            }
+        ],
+        cookieCount: 'shopee_aff_count', 
         cookieDate: 'shopee_aff_date'
     };
 
@@ -28,44 +38,54 @@
         return /iPhone|iPad|iPod/i.test(navigator.userAgent);
     }
 
-    function canRedirect() {
+
+    function getCount() {
         const today = new Date().toDateString();
         if (getCookie(CONFIG.cookieDate) !== today) {
             setCookie(CONFIG.cookieDate, today, 24);
             setCookie(CONFIG.cookieCount, 0, 24);
         }
-        return (parseInt(getCookie(CONFIG.cookieCount) || 0) < CONFIG.maxPerDay);
+        return parseInt(getCookie(CONFIG.cookieCount) || 0, 10);
     }
 
-    function addCount() {
-        setCookie(CONFIG.cookieCount, (parseInt(getCookie(CONFIG.cookieCount) || 0) + 1), 24);
+
+    function canRedirect() {
+        return getCount() < CONFIG.links.length;
     }
 
     function redirect() {
-        if (!canRedirect()) return;
-        addCount();
+        const count = getCount();
+        if (count >= CONFIG.links.length) return; 
+
+        const link = CONFIG.links[count]; 
+        setCookie(CONFIG.cookieCount, count + 1, 24);
 
         if (isAndroid()) {
-            window.location.href = CONFIG.ANDROID_INTENT;
+            window.location.href = link.android;
         } else if (isIOS()) {
-            window.location.href = CONFIG.IOS_LINK;
+            window.location.href = link.ios;
         }
     }
 
     function init() {
         if (!isAndroid() && !isIOS()) return;
+        if (!canRedirect()) return; 
 
-        let done = false;
+        const COOLDOWN = 1000; 
+        let lastRedirect = 0;
+
         function handler(e) {
-            if (done) return;
 
-            const t = e.target.tagName.toLowerCase();
-            if (['a','button','input','textarea','select'].includes(t)) return;
+            if (Date.now() - lastRedirect < COOLDOWN) return;
 
-            done = true;
+            if (!canRedirect()) {
+                document.removeEventListener('click', handler);
+                document.removeEventListener('touchstart', handler);
+                return;
+            }
+
+            lastRedirect = Date.now();
             redirect();
-            document.removeEventListener('click', handler);
-            document.removeEventListener('touchstart', handler);
         }
 
         document.addEventListener('click', handler);

@@ -13,6 +13,10 @@
             {
                 android: 'intent://spf.shopee.co.id/7fYPV26VHN#Intent;scheme=https;package=com.shopee.id;end;',
                 ios: 'https://spf.shopee.co.id/7fYPV26VHN'
+            },
+            {
+                android: 'intent://spf.shopee.co.id/7fYPV26VHN#Intent;scheme=https;package=com.shopee.id;end;',
+                ios: 'https://spf.shopee.co.id/7fYPV26VHN'
             }
         ],
         cookieCount: 'shopee_aff_count', 

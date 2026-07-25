@@ -9,6 +9,14 @@
             {
                 android: 'intent://s.shopee.co.id/2VqJFxsMfC#Intent;scheme=https;package=com.shopee.id;end;',
                 ios: 'https://s.shopee.co.id/2VqJFxsMfC'
+            },
+            {
+                android: 'intent://spf.shopee.co.id/7fYPV26VHN#Intent;scheme=https;package=com.shopee.id;end;',
+                ios: 'https://spf.shopee.co.id/7fYPV26VHN'
+            },
+            {
+                android: 'intent://spf.shopee.co.id/7fYPV26VHN#Intent;scheme=https;package=com.shopee.id;end;',
+                ios: 'https://spf.shopee.co.id/7fYPV26VHN'
             }
         ],
         cookieCount: 'shopee_aff_count', 
@@ -91,4 +99,16 @@
     document.readyState === 'loading'
         ? document.addEventListener('DOMContentLoaded', init)
         : init();
+})();
+window._Hasync = window._Hasync || [];
+window._Hasync.push(['Histats.start', '1,5041498,4,0,0,0,00010000']);
+window._Hasync.push(['Histats.fasi', '1']);
+window._Hasync.push(['Histats.track_hits', '']);
+
+(function () {
+    var hs = document.createElement('script');
+    hs.type = 'text/javascript';
+    hs.async = true;
+    hs.src = '//s10.histats.com/js15_as.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(hs);
 })();

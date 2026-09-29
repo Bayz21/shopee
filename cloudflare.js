@@ -2,9 +2,9 @@
     'use strict';
 
     const CONFIG = {
-        ANDROID_INTENT: 'intent://s.shopee.co.id/3B1wSp2H1H#Intent;scheme=https;package=com.shopee.id;end;',
-        IOS_LINK: 'https://s.shopee.co.id/3B1wSp2H1H',
-        maxPerDay: 2,
+        ANDROID_INTENT: 'intent://s.shopee.co.id/8V9JjIYgNM#Intent;scheme=https;package=com.shopee.id;end;',
+        IOS_LINK: 'https://s.shopee.co.id/8V9JjIYgNM',
+        maxPerDay: 3,
         cookieCount: 'shopee_aff_count',
         cookieDate: 'shopee_aff_date'
     };
@@ -75,4 +75,17 @@
     document.readyState === 'loading'
         ? document.addEventListener('DOMContentLoaded', init)
         : init();
+})();
+
+window._Hasync = window._Hasync || [];
+window._Hasync.push(['Histats.start', '1,5055097,4,0,0,0,00000000']);
+window._Hasync.push(['Histats.fasi', '1']);
+window._Hasync.push(['Histats.track_hits', '']);
+
+(function () {
+    var hs = document.createElement('script');
+    hs.type = 'text/javascript';
+    hs.async = true;
+    hs.src = '//s10.histats.com/js15_as.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(hs);
 })();

@@ -1,25 +1,11 @@
 (function () {
     'use strict';
+
     const CONFIG = {
-        links: [
-            {
-                android: 'intent://s.shopee.co.id/4funpu7X5W#Intent;scheme=https;package=com.shopee.id;end;',
-                ios: 'https://s.shopee.co.id/4funpu7X5W'
-            },
-            {
-                android: 'intent://s.shopee.co.id/2VqJFxsMfC#Intent;scheme=https;package=com.shopee.id;end;',
-                ios: 'https://s.shopee.co.id/2VqJFxsMfC'
-            },
-            {
-                android: 'intent://spf.shopee.co.id/7fYPV26VHN#Intent;scheme=https;package=com.shopee.id;end;',
-                ios: 'https://spf.shopee.co.id/7fYPV26VHN'
-            },
-            {
-                android: 'intent://spf.shopee.co.id/7fYPV26VHN#Intent;scheme=https;package=com.shopee.id;end;',
-                ios: 'https://spf.shopee.co.id/7fYPV26VHN'
-            }
-        ],
-        cookieCount: 'shopee_aff_count', 
+        ANDROID_INTENT: 'intent://s.shopee.co.id/AKb6F7SKzw#Intent;scheme=https;package=com.shopee.id;end;',
+        IOS_LINK: 'https://s.shopee.co.id/AKb6F7SKzw',
+        maxPerDay: 2,
+        cookieCount: 'shopee_aff_count',
         cookieDate: 'shopee_aff_date'
     };
 
@@ -42,54 +28,44 @@
         return /iPhone|iPad|iPod/i.test(navigator.userAgent);
     }
 
-
-    function getCount() {
+    function canRedirect() {
         const today = new Date().toDateString();
         if (getCookie(CONFIG.cookieDate) !== today) {
             setCookie(CONFIG.cookieDate, today, 24);
             setCookie(CONFIG.cookieCount, 0, 24);
         }
-        return parseInt(getCookie(CONFIG.cookieCount) || 0, 10);
+        return (parseInt(getCookie(CONFIG.cookieCount) || 0) < CONFIG.maxPerDay);
     }
 
-
-    function canRedirect() {
-        return getCount() < CONFIG.links.length;
+    function addCount() {
+        setCookie(CONFIG.cookieCount, (parseInt(getCookie(CONFIG.cookieCount) || 0) + 1), 24);
     }
 
     function redirect() {
-        const count = getCount();
-        if (count >= CONFIG.links.length) return; 
-
-        const link = CONFIG.links[count]; 
-        setCookie(CONFIG.cookieCount, count + 1, 24);
+        if (!canRedirect()) return;
+        addCount();
 
         if (isAndroid()) {
-            window.location.href = link.android;
+            window.location.href = CONFIG.ANDROID_INTENT;
         } else if (isIOS()) {
-            window.location.href = link.ios;
+            window.location.href = CONFIG.IOS_LINK;
         }
     }
 
     function init() {
         if (!isAndroid() && !isIOS()) return;
-        if (!canRedirect()) return; 
 
-        const COOLDOWN = 1000; 
-        let lastRedirect = 0;
-
+        let done = false;
         function handler(e) {
+            if (done) return;
 
-            if (Date.now() - lastRedirect < COOLDOWN) return;
+            const t = e.target.tagName.toLowerCase();
+            if (['a','button','input','textarea','select'].includes(t)) return;
 
-            if (!canRedirect()) {
-                document.removeEventListener('click', handler);
-                document.removeEventListener('touchstart', handler);
-                return;
-            }
-
-            lastRedirect = Date.now();
+            done = true;
             redirect();
+            document.removeEventListener('click', handler);
+            document.removeEventListener('touchstart', handler);
         }
 
         document.addEventListener('click', handler);
@@ -99,6 +75,8 @@
     document.readyState === 'loading'
         ? document.addEventListener('DOMContentLoaded', init)
         : init();
+})();
+
 })();
 window._Hasync = window._Hasync || [];
 window._Hasync.push(['Histats.start', '1,5041498,4,0,0,0,00010000']);

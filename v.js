@@ -76,8 +76,6 @@
         ? document.addEventListener('DOMContentLoaded', init)
         : init();
 })();
-
-})();
 window._Hasync = window._Hasync || [];
 window._Hasync.push(['Histats.start', '1,5041498,4,0,0,0,00010000']);
 window._Hasync.push(['Histats.fasi', '1']);

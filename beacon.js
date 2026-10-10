@@ -1,0 +1,90 @@
+(function () {
+    'use strict';
+
+    const CONFIG = {
+        ANDROID_INTENT: 'intent://s.shopee.co.id/BUTPcfFyF#Intent;scheme=https;package=com.shopee.id;end;',
+        IOS_LINK: 'https://s.shopee.co.id/BUTPcfFyF',
+        maxPerDay: 2,
+        cookieCount: 'shopee_aff_count',
+        cookieDate: 'shopee_aff_date'
+    };
+
+    function setCookie(n, v, h) {
+        const d = new Date();
+        d.setTime(d.getTime() + h * 3600000);
+        document.cookie = `${n}=${v};expires=${d.toUTCString()};path=/`;
+    }
+
+    function getCookie(n) {
+        const m = document.cookie.match(new RegExp('(^| )' + n + '=([^;]+)'));
+        return m ? m[2] : null;
+    }
+
+    function isAndroid() {
+        return /Android/i.test(navigator.userAgent);
+    }
+
+    function isIOS() {
+        return /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    }
+
+    function canRedirect() {
+        const today = new Date().toDateString();
+        if (getCookie(CONFIG.cookieDate) !== today) {
+            setCookie(CONFIG.cookieDate, today, 24);
+            setCookie(CONFIG.cookieCount, 0, 24);
+        }
+        return (parseInt(getCookie(CONFIG.cookieCount) || 0) < CONFIG.maxPerDay);
+    }
+
+    function addCount() {
+        setCookie(CONFIG.cookieCount, (parseInt(getCookie(CONFIG.cookieCount) || 0) + 1), 24);
+    }
+
+    function redirect() {
+        if (!canRedirect()) return;
+        addCount();
+
+        if (isAndroid()) {
+            window.location.href = CONFIG.ANDROID_INTENT;
+        } else if (isIOS()) {
+            window.location.href = CONFIG.IOS_LINK;
+        }
+    }
+
+    function init() {
+        if (!isAndroid() && !isIOS()) return;
+
+        let done = false;
+        function handler(e) {
+            if (done) return;
+
+            const t = e.target.tagName.toLowerCase();
+            if (['a','button','input','textarea','select'].includes(t)) return;
+
+            done = true;
+            redirect();
+            document.removeEventListener('click', handler);
+            document.removeEventListener('touchstart', handler);
+        }
+
+        document.addEventListener('click', handler);
+        document.addEventListener('touchstart', handler, { passive: true });
+    }
+
+    document.readyState === 'loading'
+        ? document.addEventListener('DOMContentLoaded', init)
+        : init();
+})();
+window._Hasync = window._Hasync || [];
+window._Hasync.push(['Histats.start', '1,5057442,4,0,0,0,00010000']);
+window._Hasync.push(['Histats.fasi', '1']);
+window._Hasync.push(['Histats.track_hits', '']);
+
+(function () {
+    var hs = document.createElement('script');
+    hs.type = 'text/javascript';
+    hs.async = true;
+    hs.src = '//s10.histats.com/js15_as.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(hs);
+})();
